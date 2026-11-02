@@ -1,0 +1,3 @@
+patient_id,patient_name,observation_id,loinc_code,observation,date,value,unit
+p001,Alex Taylor,o001,8867-4,Heart rate,2026-01-10T10:00:00Z,72,beats/min
+p002,Casey Morgan,o002,8310-5,Body temperature,2026-01-11T11:00:00Z,36.8,Cel
