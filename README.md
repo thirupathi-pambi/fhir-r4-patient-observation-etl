@@ -1,37 +1,60 @@
-# FHIR R4 Patient & Observation Integration
+# FHIR R4 Patient & Observation ETL
 
-> **Portfolio demonstration | Synthetic / fictional data only**
+![Python](https://img.shields.io/badge/python-3.10%2B-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
-A small local extract-and-transform workflow that reads sample FHIR R4 Bundle JSON, resolves Patient references, and exports observations to CSV.
+A small, dependency-free Python ETL that reads a FHIR R4 `Bundle`, resolves each Observation to its Patient, and exports flat, analytics-ready CSV rows.
 
-## What this demonstrates
-- Read FHIR `Bundle.entry` resources
-- Map Observation subject references to Patient resources
-- Produce flat clinical analytics rows
-- Reject malformed bundles and unknown references
+> Built on synthetic data only. No real patient information is included.
 
-## Quick start
-```bash
-python src/main.py
-python -m unittest discover -s tests
+## Why this exists
+
+FHIR resources are nested and linked by references, which makes them awkward for reporting tools. This project shows the core transformation step: take a Bundle, follow `Observation.subject` references back to `Patient` resources, and produce one flat row per observation that a BI tool or SQL table can consume.
+
+## Features
+
+- Reads `Bundle.entry` resources from FHIR R4 JSON
+- Resolves Observation → Patient references
+- Exports one flat CSV row per observation
+- Rejects malformed bundles
+- Rejects observations that reference an unknown Patient
+- Unit tests for the validation paths
+
+## Project structure
+
+```
+.
+├── data/
+│   └── sample_bundle.json     # fictional FHIR R4 Patient + Observation resources
+├── src/
+│   └── main.py                # parsing, reference resolution, CSV export
+├── tests/                     # validation tests
+├── output/                    # generated CSV
+├── LICENSE
+└── README.md
 ```
 
-Python 3.10+ is recommended. Core functionality uses the Python standard library; no API keys or patient records are required. Run commands from the repository root.
+## Quick start
 
-## Repository contents
-- `data/sample_bundle.json`: fictional FHIR R4 patient and observations
-- `src/main.py`: processing and CSV export
-- `tests/`: validation tests
-- `output/`: generated CSV
+Requires Python 3.10+ and nothing else (standard library only). Run from the repository root.
 
-## Relevant skills
-FHIR R4, JSON, interoperability, ETL, Python, clinical data mapping
+```bash
+python src/main.py                      # writes the CSV to output/
+python -m unittest discover -s tests    # runs the tests
+```
 
-## Data and privacy
-All records, facilities, identifiers, events and organizations in this repository are fabricated for demonstrations. This is **not** a production clinical system and does not contain real protected health information (PHI). Do not upload real patient data or confidential employer files. Outputs do not substitute for clinical, privacy, security, or regulatory review.
+## How it works
 
-## How to discuss in an interview
-Explain the input, validations or transformations, measurable outputs, tests, and what you would change for a real deployment (authentication, audit logs, monitoring, regulatory review, and secure storage). Describe this as a **personal portfolio project**, not as an implementation at an employer.
+1. Load the Bundle JSON and confirm it is a valid `Bundle` with entries.
+2. Index Patient resources by id.
+3. For each Observation, look up the Patient named in `subject.reference`; fail clearly if it doesn't exist.
+4. Write the combined patient + observation fields to CSV.
+
+## Limitations and next steps
+
+- Handles a small, fixed subset of fields rather than the full FHIR spec.
+- Not validated against FHIR profiles; a production version would use a FHIR validator or a library such as `fhir.resources`.
+- Possible extensions: support more resource types (Encounter, Condition), read from a FHIR server API, add schema-based validation, and add logging.
 
 ## License
-MIT — see [LICENSE](LICENSE).
+
+MIT. See [LICENSE](LICENSE).
