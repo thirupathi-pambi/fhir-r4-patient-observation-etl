@@ -55,6 +55,3 @@ python -m unittest discover -s tests    # runs the tests
 - Not validated against FHIR profiles; a production version would use a FHIR validator or a library such as `fhir.resources`.
 - Possible extensions: support more resource types (Encounter, Condition), read from a FHIR server API, add schema-based validation, and add logging.
 
-## License
-
-MIT. See [LICENSE](LICENSE).
